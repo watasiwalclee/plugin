@@ -8,9 +8,9 @@
 
 """
 
-__author__ = ' '
-__date__ = '2018-06-02'
-__copyright__ = 'Copyright 2018, mine'
+__author__ = 'memory10524@gmail.com'
+__date__ = '2018-06-22'
+__copyright__ = 'Copyright 2018, LCLee'
 
 import unittest
 
@@ -18,7 +18,7 @@ from PyQt5.QtGui import QIcon
 
 
 
-class ClassTestDialogTest(unittest.TestCase):
+class LCpluginDialogTest(unittest.TestCase):
     """Test rerources work."""
 
     def setUp(self):
@@ -31,12 +31,12 @@ class ClassTestDialogTest(unittest.TestCase):
 
     def test_icon_png(self):
         """Test we can click OK."""
-        path = ':/plugins/ClassTest/icon.png'
+        path = ':/plugins/LCplugin/icon.png'
         icon = QIcon(path)
         self.assertFalse(icon.isNull())
 
 if __name__ == "__main__":
-    suite = unittest.makeSuite(ClassTestResourcesTest)
+    suite = unittest.makeSuite(LCpluginResourcesTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
 

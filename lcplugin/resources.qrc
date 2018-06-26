@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/my_1st_plugin_modoule" >
+    <qresource prefix="/plugins/LCplugin" >
         <file>icon.png</file>
     </qresource>
 </RCC>

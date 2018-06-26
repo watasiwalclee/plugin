@@ -1,10 +1,10 @@
 Plugin Builder Results
 
-Your plugin ClassTest was created in:
-    C:/Users/secret/Desktop/LCplgin\classtest
+Your plugin LCplugin was created in:
+    C:/Users/KTLab/Desktop/plugin test\lcplugin
 
 Your QGIS plugin directory is located at:
-    C:/Users/secret/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins
+    C:/Users/KTLab/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins
 
 What's Next:
 
@@ -17,11 +17,11 @@ What's Next:
 
   * Test the plugin by enabling it in the QGIS plugin manager
 
-  * Customize it by editing the implementation file: ``my_1st_plugin_modoule.py``
+  * Customize it by editing the implementation file: ``LCplugin.py``
 
   * Create your own custom icon, replacing the default icon.png
 
-  * Modify your user interface by opening ClassTest.ui in Qt Designer
+  * Modify your user interface by opening LCplugin.ui in Qt Designer
 
   * You can use the Makefile to compile your Ui and resource files when
     you make changes. This requires GNU make (gmake)

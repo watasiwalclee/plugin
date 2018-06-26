@@ -7,12 +7,12 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=my_1st_plugin
+name=LCplugin
 qgisMinimumVersion=3.0
-description=my_1st_plugin
+description=檢核Beta
 version=0.1
-author=mine
-email= 
+author=LCLee
+email=memory10524@gmail.com
 
 about=Provide a brief description of the plugin and its purpose.
 
@@ -32,7 +32,7 @@ homepage=http://homepage
 category=Plugins
 icon=icon.png
 # experimental flag
-experimental=False
+experimental=True
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False

@@ -1,12 +1,12 @@
 #/***************************************************************************
-# ClassTest
+# LCplugin
 #
-# my_1st_plugin
+# 檢核Beta
 #							 -------------------
-#		begin				: 2018-06-02
+#		begin				: 2018-06-22
 #		git sha				: $Format:%H$
-#		copyright			: (C) 2018 by mine
-#		email				:  
+#		copyright			: (C) 2018 by LCLee
+#		email				: memory10524@gmail.com
 # ***************************************************************************/
 #
 #/***************************************************************************
@@ -38,15 +38,15 @@ LOCALES =
 # translation
 SOURCES = \
 	__init__.py \
-	my_1st_plugin_modoule.py my_1st_plugin_modoule_dialog.py
+	LCplugin.py LCplugin_dialog.py
 
-PLUGINNAME = my_1st_plugin_modoule
+PLUGINNAME = LCplugin
 
 PY_FILES = \
 	__init__.py \
-	my_1st_plugin_modoule.py my_1st_plugin_modoule_dialog.py
+	LCplugin.py LCplugin_dialog.py
 
-UI_FILES = my_1st_plugin_modoule_dialog_base.ui
+UI_FILES = LCplugin_dialog_base.ui
 
 EXTRAS = metadata.txt icon.png
 

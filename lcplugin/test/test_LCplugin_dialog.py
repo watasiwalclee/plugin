@@ -8,26 +8,26 @@
 
 """
 
-__author__ = ' '
-__date__ = '2018-06-02'
-__copyright__ = 'Copyright 2018, mine'
+__author__ = 'memory10524@gmail.com'
+__date__ = '2018-06-22'
+__copyright__ = 'Copyright 2018, LCLee'
 
 import unittest
 
 from PyQt5.QtGui import QDialogButtonBox, QDialog
 
-from my_1st_plugin_modoule_dialog import ClassTestDialog
+from LCplugin_dialog import LCpluginDialog
 
 from utilities import get_qgis_app
 QGIS_APP = get_qgis_app()
 
 
-class ClassTestDialogTest(unittest.TestCase):
+class LCpluginDialogTest(unittest.TestCase):
     """Test dialog works."""
 
     def setUp(self):
         """Runs before each test."""
-        self.dialog = ClassTestDialog(None)
+        self.dialog = LCpluginDialog(None)
 
     def tearDown(self):
         """Runs after each test."""
@@ -49,7 +49,7 @@ class ClassTestDialogTest(unittest.TestCase):
         self.assertEqual(result, QDialog.Rejected)
 
 if __name__ == "__main__":
-    suite = unittest.makeSuite(ClassTestDialogTest)
+    suite = unittest.makeSuite(LCpluginDialogTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
 
