@@ -97,36 +97,42 @@ def start_reshape(file_name):
     inp_dic['TRANSECTS'] = transects_data
 
     #polygon rebuild to dict
-    sub_polygon = {}
-    for d in inp_dic['Polygons']:
-        coordinate = [float(d[1]),float(d[2])]
-        if d[0] not in sub_polygon:  # if key not exist, create key in dict and append coordinate in to dict
-            sub_polygon[d[0]] = []
-            sub_polygon[d[0]].append(coordinate)
-        else:  # if key exist, add coordinate in to dict
-            sub_polygon[d[0]].append(coordinate)  
+    try:
+        sub_polygon = {}
+        for d in inp_dic['Polygons']:
+            coordinate = [float(d[1]),float(d[2])]
+            if d[0] not in sub_polygon:  # if key not exist, create key in dict and append coordinate in to dict
+                sub_polygon[d[0]] = []
+                sub_polygon[d[0]].append(coordinate)
+            else:  # if key exist, add coordinate in to dict
+                sub_polygon[d[0]].append(coordinate)  
 
-    inp_dic['Polygons'] = sub_polygon
+        inp_dic['Polygons'] = sub_polygon
+    except:
+        pass
 
-    # the gravity center of polygon
-    Polygon_center = {}
-    for p in inp_dic['Polygons']:
-        gcenter_x = 0
-        gcenter_y = 0
-        for pi in inp_dic['Polygons'][p]:
-            gcenter_x += pi[0]/len(inp_dic['Polygons'][p])
-            gcenter_y += pi[1]/len(inp_dic['Polygons'][p])
-        Polygon_center[p] = [gcenter_x,gcenter_y]
-    
-    inp_dic['Polygon_center'] = Polygon_center
+    try:
+        # the gravity center of polygon
+        Polygon_center = {}
+        for p in inp_dic['Polygons']:
+            gcenter_x = 0
+            gcenter_y = 0
+            for pi in inp_dic['Polygons'][p]:
+                gcenter_x += pi[0]/len(inp_dic['Polygons'][p])
+                gcenter_y += pi[1]/len(inp_dic['Polygons'][p])
+            Polygon_center[p] = [gcenter_x,gcenter_y]
+        
+        inp_dic['Polygon_center'] = Polygon_center
 
-    sub_xsec = {}
-    for xs in inp_dic['XSECTIONS']:
-        sub_xsec[xs[0]] = {}
-        sub_xsec[xs[0]]['Shape'] = xs[1]
-        sub_xsec[xs[0]]['Information'] = xs[2:]
+        sub_xsec = {}
+        for xs in inp_dic['XSECTIONS']:
+            sub_xsec[xs[0]] = {}
+            sub_xsec[xs[0]]['Shape'] = xs[1]
+            sub_xsec[xs[0]]['Information'] = xs[2:]
 
-    inp_dic['XSECTIONS'] = sub_xsec
+        inp_dic['XSECTIONS'] = sub_xsec
+    except:
+        pass
 
     # determination of road ditch
     epsilon = 0.03

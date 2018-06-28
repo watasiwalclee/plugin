@@ -112,13 +112,16 @@ def put_on_map(inp_Dict):
     QgsField('ditch 2',QVariant.String),
     QgsField('ditch 3',QVariant.String),
     QgsField('ditch 4',QVariant.String),
-    QgsField('ditch 5',QVariant.String),])
+    QgsField('ditch 5',QVariant.String),
+    QgsField('ditch 6',QVariant.String),
+    QgsField('ditch 7',QVariant.String),
+    QgsField('ditch 8',QVariant.String),])
     RoadDitch_layer.updateFields()
 
     Junction_column = ['Name','X','Y','Elevation','Max Depth','InitDepth','SurDepth','Aponded']
     Storage_column = ['Name','Elevation','Max Depth','InitDepth','Shape','Curve Name/Params','Fevap','Psi']
     Link_column = ['Name','From Node','To Node','Length','Roughness','InOffset','OutOffset','InitFlow','MaxFlow']
-    RoadDitch_column = ['ditch 1','ditch 2','ditch 3','ditch 4','ditch 5']
+    RoadDitch_column = ['ditch 1','ditch 2','ditch 3','ditch 4','ditch 5','ditch 6','ditch 7','ditch 8']
 
     # add point features
     for d in node_cor:
@@ -195,19 +198,50 @@ def put_on_map(inp_Dict):
             Sewer_layer.dataProvider().addFeatures([Line_feat])
 
     # add polygon link feature
-    Subcatchment_dic = inp_Dict['SUBCATCHMENTS']
-    if len(Subcatchment_dic) != 0:
-        for s in Subcatchment_dic:
-            SL_feat = QgsFeature(PolygonLink_layer.fields())
-            SL_feat.setAttribute('From node',s)
-            SL_feat.setAttribute('To node',Subcatchment_dic[s][1])
-            fromnode_cor = QgsPoint(inp_Dict['Polygon_center'][s][0],inp_Dict['Polygon_center'][s][1])
-            outlet_point = Subcatchment_dic[s][1]
-            tonode_cor = QgsPoint(node_cor[outlet_point][0],node_cor[outlet_point][1])
-            SL_feat.setGeometry(QgsGeometry.fromPolyline([fromnode_cor,tonode_cor]))
-            PolygonLink_layer.dataProvider().addFeatures([SL_feat])
-    path = os.path.dirname(os.path.abspath(__file__))
-    PolygonLink_layer.loadNamedStyle(os.path.normpath(path)+'\\OutLet_Check.qml')
+    try:
+        # add Polygon features
+        Polygon_dic = inp_Dict['Polygons']
+        Subarea_dic = inp_Dict['SUBAREAS']
+        infiltration_dic = inp_Dict['INFILTRATION']
+        for c in Polygon_dic:
+            Polygon_feat = QgsFeature(Polygon_layer.fields())
+            Polygon_feat.setAttribute('Name',c)
+            Polygon_feat.setAttribute('X',round(inp_Dict['Polygon_center'][c][0],3))
+            Polygon_feat.setAttribute('Y',round(inp_Dict['Polygon_center'][c][1],3))
+            Polygon_feat.setAttribute('Rain Gage',Subcatchment_dic[c][0])
+            Polygon_feat.setAttribute('Outlet',Subcatchment_dic[c][1])
+            Polygon_feat.setAttribute('Area',Subcatchment_dic[c][2])
+            Polygon_feat.setAttribute('%Imperv',Subcatchment_dic[c][3])
+            Polygon_feat.setAttribute('Width',Subcatchment_dic[c][4])
+            Polygon_feat.setAttribute('%Slope',Subcatchment_dic[c][5])
+            Polygon_feat.setAttribute('N-Imperv',Subarea_dic[c][0])
+            Polygon_feat.setAttribute('N-Perv',Subarea_dic[c][1])
+            Polygon_feat.setAttribute('S-Imperv',Subarea_dic[c][2])
+            Polygon_feat.setAttribute('S-Perv',Subarea_dic[c][3])
+            Polygon_feat.setAttribute('PctZero',Subarea_dic[c][4])
+            Polygon_feat.setAttribute('RouteTo',Subarea_dic[c][5])
+            Polygon_feat.setAttribute('CurveNum',infiltration_dic[c][0])
+            Polygon_feat.setAttribute('Conductivity',infiltration_dic[c][1])
+            Polygon_feat.setAttribute('DryTime',infiltration_dic[c][2])
+            Polygon_point = [QgsPointXY(p[0],p[1]) for p in Polygon_dic[c]]
+            Polygon_feat.setGeometry(QgsGeometry.fromPolygonXY([Polygon_point]))
+            Polygon_layer.dataProvider().addFeatures([Polygon_feat])
+        
+        Subcatchment_dic = inp_Dict['SUBCATCHMENTS']
+        if len(Subcatchment_dic) != 0:
+            for s in Subcatchment_dic:
+                SL_feat = QgsFeature(PolygonLink_layer.fields())
+                SL_feat.setAttribute('From node',s)
+                SL_feat.setAttribute('To node',Subcatchment_dic[s][1])
+                fromnode_cor = QgsPoint(inp_Dict['Polygon_center'][s][0],inp_Dict['Polygon_center'][s][1])
+                outlet_point = Subcatchment_dic[s][1]
+                tonode_cor = QgsPoint(node_cor[outlet_point][0],node_cor[outlet_point][1])
+                SL_feat.setGeometry(QgsGeometry.fromPolyline([fromnode_cor,tonode_cor]))
+                PolygonLink_layer.dataProvider().addFeatures([SL_feat])
+        path = os.path.dirname(os.path.abspath(__file__))
+        PolygonLink_layer.loadNamedStyle(os.path.normpath(path)+'\\OutLet_Check.qml')
+    except:
+        pass
     
     
     # add road ditch features
@@ -234,37 +268,13 @@ def put_on_map(inp_Dict):
             RoadDitch_layer.dataProvider().addFeatures([Line_feat])
 
 
-    # add Polygon features
-    Polygon_dic = inp_Dict['Polygons']
-    Subarea_dic = inp_Dict['SUBAREAS']
-    infiltration_dic = inp_Dict['INFILTRATION']
-    for c in Polygon_dic:
-        Polygon_feat = QgsFeature(Polygon_layer.fields())
-        Polygon_feat.setAttribute('Name',c)
-        Polygon_feat.setAttribute('X',round(inp_Dict['Polygon_center'][c][0],3))
-        Polygon_feat.setAttribute('Y',round(inp_Dict['Polygon_center'][c][1],3))
-        Polygon_feat.setAttribute('Rain Gage',Subcatchment_dic[c][0])
-        Polygon_feat.setAttribute('Outlet',Subcatchment_dic[c][1])
-        Polygon_feat.setAttribute('Area',Subcatchment_dic[c][2])
-        Polygon_feat.setAttribute('%Imperv',Subcatchment_dic[c][3])
-        Polygon_feat.setAttribute('Width',Subcatchment_dic[c][4])
-        Polygon_feat.setAttribute('%Slope',Subcatchment_dic[c][5])
-        Polygon_feat.setAttribute('N-Imperv',Subarea_dic[c][0])
-        Polygon_feat.setAttribute('N-Perv',Subarea_dic[c][1])
-        Polygon_feat.setAttribute('S-Imperv',Subarea_dic[c][2])
-        Polygon_feat.setAttribute('S-Perv',Subarea_dic[c][3])
-        Polygon_feat.setAttribute('PctZero',Subarea_dic[c][4])
-        Polygon_feat.setAttribute('RouteTo',Subarea_dic[c][5])
-        Polygon_feat.setAttribute('CurveNum',infiltration_dic[c][0])
-        Polygon_feat.setAttribute('Conductivity',infiltration_dic[c][1])
-        Polygon_feat.setAttribute('DryTime',infiltration_dic[c][2])
-        Polygon_point = [QgsPointXY(p[0],p[1]) for p in Polygon_dic[c]]
-        Polygon_feat.setGeometry(QgsGeometry.fromPolygonXY([Polygon_point]))
-        Polygon_layer.dataProvider().addFeatures([Polygon_feat])
     
-    QgsProject.instance().addMapLayer(Polygon_layer)
-    QgsProject.instance().addMapLayer(PolygonLink_layer)
-    #QgsProject.instance().addMapLayer(RoadDitch_layer)
+    try:
+        QgsProject.instance().addMapLayer(Polygon_layer)
+        QgsProject.instance().addMapLayer(PolygonLink_layer)
+    except:
+        pass
+    QgsProject.instance().addMapLayer(RoadDitch_layer)
     QgsProject.instance().addMapLayer(Sewer_layer)
     QgsProject.instance().addMapLayer(Channel_layer)
     QgsProject.instance().addMapLayer(Road_layer)
