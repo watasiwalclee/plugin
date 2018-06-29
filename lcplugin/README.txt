@@ -9,6 +9,12 @@ C:\Users\[使用者名稱]\AppData\Roaming\QGIS\QGIS3\profiles\default\python\pl
 3.人孔對照表不能吃
 
 
+更新紀錄:
+==================================
+
+6/29修正:
+Subcatchments code位置調整(宣告變數位置修正)
+
 6/28修正:
 Polygon例外處理
 ditch數量增加(發生過6個Ditch)
