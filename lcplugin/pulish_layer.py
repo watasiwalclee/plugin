@@ -203,6 +203,7 @@ def put_on_map(inp_Dict):
         Polygon_dic = inp_Dict['Polygons']
         Subarea_dic = inp_Dict['SUBAREAS']
         infiltration_dic = inp_Dict['INFILTRATION']
+        Subcatchment_dic = inp_Dict['SUBCATCHMENTS']
         for c in Polygon_dic:
             Polygon_feat = QgsFeature(Polygon_layer.fields())
             Polygon_feat.setAttribute('Name',c)
@@ -227,7 +228,7 @@ def put_on_map(inp_Dict):
             Polygon_feat.setGeometry(QgsGeometry.fromPolygonXY([Polygon_point]))
             Polygon_layer.dataProvider().addFeatures([Polygon_feat])
         
-        Subcatchment_dic = inp_Dict['SUBCATCHMENTS']
+        
         if len(Subcatchment_dic) != 0:
             for s in Subcatchment_dic:
                 SL_feat = QgsFeature(PolygonLink_layer.fields())
@@ -240,9 +241,8 @@ def put_on_map(inp_Dict):
                 PolygonLink_layer.dataProvider().addFeatures([SL_feat])
         path = os.path.dirname(os.path.abspath(__file__))
         PolygonLink_layer.loadNamedStyle(os.path.normpath(path)+'\\OutLet_Check.qml')
-    except:
-        pass
-    
+    except Exception as e:
+        print(e)
     
     # add road ditch features
     Road_ditch_dict = inp_Dict['road_ditch']
