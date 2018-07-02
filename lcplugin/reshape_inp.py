@@ -20,7 +20,7 @@ def data_rebuild2Dict(Taget):
 
 
 def start_reshape(file_name):
-    file = open(os.path.normpath(file_name),'r')
+    file = open(os.path.normpath(file_name),'r',errors='ignore')
     title = []
     inp_dic = {}
     for s in file.readlines():
@@ -63,12 +63,13 @@ def start_reshape(file_name):
     # SUBCATCHMENTS rebuild to dict
     sub_subc = {}
     for c in inp_dic['SUBCATCHMENTS']:
-        cor_l = []
-        cor_l.append(c[1])  # Rain Gage must be string
-        cor_l.append(c[2])  # Outlet must be string
-        for ci in c[3:]:
-            cor_l.append(float(ci))
-        sub_subc[c[0]] = cor_l
+        if c[0] != ';':
+            cor_l = []
+            cor_l.append(c[1])  # Rain Gage must be string
+            cor_l.append(c[2])  # Outlet must be string
+            for ci in c[3:]:
+                cor_l.append(float(ci))
+            sub_subc[c[0]] = cor_l
 
     inp_dic['SUBCATCHMENTS'] = sub_subc
 
