@@ -12,3 +12,10 @@ C:\Users\[使用者名稱]\AppData\Roaming\QGIS\QGIS3\profiles\default\python\pl
 6/28修正:
 Polygon例外處理
 ditch數量增加(發生過6個Ditch)
+
+7/25修正:
+大小寫暫不處理
+
+12/7修正:
+斷面讀取方式修改
+增加vertices修正方式

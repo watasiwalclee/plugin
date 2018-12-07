@@ -15,8 +15,9 @@ def put_on_map(inp_Dict):
     Sewer_layer = QgsVectorLayer('LineString?crs=epsg:'+EPSGid,'Sewer','memory')
     Channel_layer = QgsVectorLayer('LineString?crs=epsg:'+EPSGid,'Channel','memory')
     PolygonLink_layer = QgsVectorLayer('LineString?crs=epsg:'+EPSGid,'PolygonLink_layer','memory')
-    RoadDitch_layer = QgsVectorLayer('LineString?crs=epsg:'+EPSGid,'RoadDitch_layer','memory')
     Polygon_layer = QgsVectorLayer('Polygon?crs=epsg:'+EPSGid,'Polygon','memory')
+    RoadDitch_layer = QgsVectorLayer('LineString?crs=epsg:'+EPSGid,'RoadDitch_layer','memory')
+    junction_connect_layer = QgsVectorLayer('Point?crs=epsg:'+EPSGid,'junction_connect','memory')
 
     node_cor = inp_Dict['COORDINATES']  # load inp information
     # add field for each layer
@@ -107,6 +108,7 @@ def put_on_map(inp_Dict):
 
     # road ditch layer
     RoadDitch_layer.dataProvider().addAttributes([QgsField('Name',QVariant.String),
+    QgsField('road_edges',QVariant.String),
     QgsField('road_width',QVariant.Double),
     QgsField('ditch 1',QVariant.String),
     QgsField('ditch 2',QVariant.String),
@@ -117,6 +119,19 @@ def put_on_map(inp_Dict):
     QgsField('ditch 7',QVariant.String),
     QgsField('ditch 8',QVariant.String),])
     RoadDitch_layer.updateFields()
+    
+    junction_connect_layer.dataProvider().addAttributes([QgsField('Name',QVariant.String),
+    QgsField('road link 1',QVariant.String),
+    QgsField('road link 2',QVariant.String),
+    QgsField('road link 3',QVariant.String),
+    QgsField('road link 4',QVariant.String),
+    QgsField('road link 5',QVariant.String),
+    QgsField('road link 6',QVariant.String),
+    QgsField('road link 7',QVariant.String),
+    QgsField('road link 8',QVariant.String),
+    QgsField('road link 9',QVariant.String),
+    QgsField('road link 10',QVariant.String),])
+    junction_connect_layer.updateFields()
 
     Junction_column = ['Name','X','Y','Elevation','Max Depth','InitDepth','SurDepth','Aponded']
     Storage_column = ['Name','Elevation','Max Depth','InitDepth','Shape','Curve Name/Params','Fevap','Psi']
@@ -179,57 +194,61 @@ def put_on_map(inp_Dict):
                 vertice_node.append(QgsPoint(vn[0],vn[1]))
             Line_feat.setGeometry(QgsGeometry.fromPolyline([fromnode_cor]+vertice_node+[tonode_cor]))
         
-        if inp_Dict['XSECTIONS'][c]['Shape'] == 'IRREGULAR':
-            curb_left_check = abs(inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][0][0] - 
-            inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][0][1])
-            curb_right_check = abs(inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][0][-1] - 
-            inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][0][-2])
-            curb_left_check_2 = inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][0] > inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][2]
-            curb_right_check_2 = inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][-1] > inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][-3]
-            curb_left_check_3 = round(abs(inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][0] - 
-            inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][1])) >= 3
-            curb_right_check_3 = round(abs(inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][-1] - 
-            inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][-2])) >= 3
-            if ((curb_left_check < curb_epislon) and curb_left_check_2 and curb_left_check_3) or ((curb_right_check < curb_epislon) and curb_right_check_2 and curb_right_check_3):  # road
-                Road_layer.dataProvider().addFeatures([Line_feat])
-            else: # Channel
-                Channel_layer.dataProvider().addFeatures([Line_feat])
+        if inp_Dict['XSECTIONS'][c]['Shape'] == 'IRREGULAR'.lower():
+            try:
+                curb_left_check = abs(inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][0][0] - 
+                inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][0][1])
+                curb_right_check = abs(inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][0][-1] - 
+                inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][0][-2])
+                curb_left_check_2 = inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][0] > inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][2]
+                curb_right_check_2 = inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][-1] > inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][-3]
+                curb_left_check_3 = round(abs(inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][0] - 
+                inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][1])) >= 2.5
+                curb_right_check_3 = round(abs(inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][-1] - 
+                inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][-2])) >= 2.5
+
+                if ((curb_left_check <= curb_epislon) and curb_left_check_2 and curb_left_check_3) or ((curb_right_check <= curb_epislon) and curb_right_check_2 and curb_right_check_3):  # road
+                    Road_layer.dataProvider().addFeatures([Line_feat])
+                else: # Channel
+                    Channel_layer.dataProvider().addFeatures([Line_feat])
+            except Exception as e:
+                print(c,e,inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'])
         else: # Sewer
             Sewer_layer.dataProvider().addFeatures([Line_feat])
 
     # add polygon link feature
+    
+    # add Polygon features
     try:
-        # add Polygon features
         Polygon_dic = inp_Dict['Polygons']
         Subarea_dic = inp_Dict['SUBAREAS']
         infiltration_dic = inp_Dict['INFILTRATION']
         Subcatchment_dic = inp_Dict['SUBCATCHMENTS']
-        for c in Polygon_dic:
-            Polygon_feat = QgsFeature(Polygon_layer.fields())
-            Polygon_feat.setAttribute('Name',c)
-            Polygon_feat.setAttribute('X',round(inp_Dict['Polygon_center'][c][0],3))
-            Polygon_feat.setAttribute('Y',round(inp_Dict['Polygon_center'][c][1],3))
-            Polygon_feat.setAttribute('Rain Gage',Subcatchment_dic[c][0])
-            Polygon_feat.setAttribute('Outlet',Subcatchment_dic[c][1])
-            Polygon_feat.setAttribute('Area',Subcatchment_dic[c][2])
-            Polygon_feat.setAttribute('%Imperv',Subcatchment_dic[c][3])
-            Polygon_feat.setAttribute('Width',Subcatchment_dic[c][4])
-            Polygon_feat.setAttribute('%Slope',Subcatchment_dic[c][5])
-            Polygon_feat.setAttribute('N-Imperv',Subarea_dic[c][0])
-            Polygon_feat.setAttribute('N-Perv',Subarea_dic[c][1])
-            Polygon_feat.setAttribute('S-Imperv',Subarea_dic[c][2])
-            Polygon_feat.setAttribute('S-Perv',Subarea_dic[c][3])
-            Polygon_feat.setAttribute('PctZero',Subarea_dic[c][4])
-            Polygon_feat.setAttribute('RouteTo',Subarea_dic[c][5])
-            Polygon_feat.setAttribute('CurveNum',infiltration_dic[c][0])
-            Polygon_feat.setAttribute('Conductivity',infiltration_dic[c][1])
-            Polygon_feat.setAttribute('DryTime',infiltration_dic[c][2])
-            Polygon_point = [QgsPointXY(p[0],p[1]) for p in Polygon_dic[c]]
-            Polygon_feat.setGeometry(QgsGeometry.fromPolygonXY([Polygon_point]))
-            Polygon_layer.dataProvider().addFeatures([Polygon_feat])
-        
-        
-        if len(Subcatchment_dic) != 0:
+        if len(Polygon_dic) != 0:
+            for c in Polygon_dic:
+                Polygon_feat = QgsFeature(Polygon_layer.fields())
+                Polygon_feat.setAttribute('Name',c)
+                Polygon_feat.setAttribute('X',round(inp_Dict['Polygon_center'][c][0],3))
+                Polygon_feat.setAttribute('Y',round(inp_Dict['Polygon_center'][c][1],3))
+                Polygon_feat.setAttribute('Rain Gage',Subcatchment_dic[c][0])
+                Polygon_feat.setAttribute('Outlet',Subcatchment_dic[c][1])
+                Polygon_feat.setAttribute('Area',Subcatchment_dic[c][2])
+                Polygon_feat.setAttribute('%Imperv',Subcatchment_dic[c][3])
+                Polygon_feat.setAttribute('Width',Subcatchment_dic[c][4])
+                Polygon_feat.setAttribute('%Slope',Subcatchment_dic[c][5])
+                Polygon_feat.setAttribute('N-Imperv',Subarea_dic[c][0])
+                Polygon_feat.setAttribute('N-Perv',Subarea_dic[c][1])
+                Polygon_feat.setAttribute('S-Imperv',Subarea_dic[c][2])
+                Polygon_feat.setAttribute('S-Perv',Subarea_dic[c][3])
+                Polygon_feat.setAttribute('PctZero',Subarea_dic[c][4])
+                Polygon_feat.setAttribute('RouteTo',Subarea_dic[c][5])
+                Polygon_feat.setAttribute('CurveNum',infiltration_dic[c][0])
+                Polygon_feat.setAttribute('Conductivity',infiltration_dic[c][1])
+                Polygon_feat.setAttribute('DryTime',infiltration_dic[c][2])
+                Polygon_point = [QgsPointXY(p[0],p[1]) for p in Polygon_dic[c]]
+                Polygon_feat.setGeometry(QgsGeometry.fromPolygonXY([Polygon_point]))
+                Polygon_layer.dataProvider().addFeatures([Polygon_feat])
+            
             for s in Subcatchment_dic:
                 SL_feat = QgsFeature(PolygonLink_layer.fields())
                 SL_feat.setAttribute('From node',s)
@@ -239,19 +258,24 @@ def put_on_map(inp_Dict):
                 tonode_cor = QgsPoint(node_cor[outlet_point][0],node_cor[outlet_point][1])
                 SL_feat.setGeometry(QgsGeometry.fromPolyline([fromnode_cor,tonode_cor]))
                 PolygonLink_layer.dataProvider().addFeatures([SL_feat])
-        path = os.path.dirname(os.path.abspath(__file__))
-        PolygonLink_layer.loadNamedStyle(os.path.normpath(path)+'\\OutLet_Check.qml')
+            path = os.path.dirname(os.path.abspath(__file__))
+            PolygonLink_layer.loadNamedStyle(os.path.normpath(path)+'\\OutLet_Check.qml')
     except Exception as e:
-        print(e)
-    
+        print(e)        
+
     # add road ditch features
     Road_ditch_dict = inp_Dict['road_ditch']
     for c in inp_Dict['XSECTIONS']:
-        if inp_Dict['XSECTIONS'][c]['Shape'] == 'IRREGULAR':
+        if inp_Dict['XSECTIONS'][c]['Shape'] == 'IRREGULAR'.lower():
             Line_feat = QgsFeature(RoadDitch_layer.fields())
             fromnode_cor = QgsPoint(node_cor[Conduit_dic[c][0]][0],node_cor[Conduit_dic[c][0]][1])
             tonode_cor = QgsPoint(node_cor[Conduit_dic[c][1]][0],node_cor[Conduit_dic[c][1]][1])
             Line_feat.setAttribute('Name',c)
+            left_edge = round(inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][0] - 
+            inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][1],3)
+            right_edge = round(inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][-1] - 
+            inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][1][-2],3)
+            Line_feat.setAttribute('road_edges','left_edge:' + str(left_edge) + '\nright_edge:' + str(right_edge))
             Line_feat.setAttribute('road_width',round(inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][0][-1] - 
             inp_Dict['TRANSECTS'][inp_Dict['XSECTIONS'][c]['Information'][0]]['section'][0][0],3))
             for i,jc in enumerate(Road_ditch_dict[inp_Dict['XSECTIONS'][c]['Information'][0]]):  # set feature attribute
@@ -266,14 +290,26 @@ def put_on_map(inp_Dict):
                 Line_feat.setGeometry(QgsGeometry.fromPolyline([fromnode_cor]+vertice_node+[tonode_cor]))
             
             RoadDitch_layer.dataProvider().addFeatures([Line_feat])
-
-
+    
+    # add junction link features
+    for c in inp_Dict['colloction_link']:
+        Junction_link_feat = QgsFeature(junction_connect_layer.fields())  # create Feature Objects
+        Junction_link_feat.setAttribute('Name',c)  # set junction name
+        for i,link in enumerate(inp_Dict['colloction_link'][c]):
+            Junction_link_feat.setAttribute('road link '+str(i+1),link)
+        try:
+            Junction_link_feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(node_cor[c][0], 
+            node_cor[c][1]))) # set point Geometry information in Feature Objects
+        except:
+            pass
+        junction_connect_layer.dataProvider().addFeatures([Junction_link_feat])  # add feature to layer
     
     try:
         QgsProject.instance().addMapLayer(Polygon_layer)
         QgsProject.instance().addMapLayer(PolygonLink_layer)
     except:
         pass
+    QgsProject.instance().addMapLayer(junction_connect_layer)
     QgsProject.instance().addMapLayer(RoadDitch_layer)
     QgsProject.instance().addMapLayer(Sewer_layer)
     QgsProject.instance().addMapLayer(Channel_layer)
@@ -281,5 +317,6 @@ def put_on_map(inp_Dict):
     QgsProject.instance().addMapLayer(Outfall_layer)
     QgsProject.instance().addMapLayer(Storage_layer)
     QgsProject.instance().addMapLayer(Junction_layer)
+    
     
 

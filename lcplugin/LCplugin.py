@@ -174,11 +174,20 @@ class LCplugin:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
         icon_path = ':/plugins/LCplugin/icon.png'
+        icon_path_2 = ':/plugins/LCplugin/icon2.png'
         self.add_action(
             icon_path,
             text=self.tr(u'Reshape inp'),
             callback=self.run,
             parent=self.iface.mainWindow())
+        
+        '''
+        self.add_action(
+            icon_path_2,
+            text=self.tr(u'second app'),
+            callback=self.run,
+            parent=self.iface.mainWindow())
+        '''
 
 
     def unload(self):
@@ -208,3 +217,4 @@ class LCplugin:
             filename = self.dlg.FileName.text()
             inp_dictionary = ri.start_reshape(filename)
             pl.put_on_map(inp_dictionary)
+
